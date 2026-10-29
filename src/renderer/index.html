@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>codex-quota</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main id="quotaPanel" aria-label="Codex 剩余额度">
+    <section class="quota-row short">
+      <div class="quota-meta"><span class="period">5H</span><span id="shortReset" class="reset">--</span><strong id="shortRemaining">--</strong></div>
+      <div id="shortTrack" class="track" role="progressbar" aria-label="5小时剩余额度" aria-valuemin="0" aria-valuemax="100">
+        <div id="shortFill" class="fill"></div><div id="shortIdeal" class="ideal" hidden></div>
+      </div>
+    </section>
+    <section class="quota-row weekly">
+      <div class="quota-meta"><span class="period">7D</span><span id="weeklyReset" class="reset">--</span><strong id="weeklyRemaining">--</strong></div>
+      <div id="weeklyTrack" class="track" role="progressbar" aria-label="7天剩余额度" aria-valuemin="0" aria-valuemax="100">
+        <div id="weeklyFill" class="fill"></div><div id="weeklyIdeal" class="ideal" hidden></div>
+      </div>
+    </section>
+  </main>
+  <script src="./renderer.js"></script>
+</body>
+</html>

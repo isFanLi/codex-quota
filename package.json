@@ -1,0 +1,95 @@
+{
+  "name": "codex-quota",
+  "version": "0.3.1",
+  "description": "Codex 额度小组件 / Windows and macOS quota panel with double-click to hide.",
+  "main": "src/main/main.js",
+  "author": "codex-quota Contributors",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isFanLi/codex-quota.git"
+  },
+  "homepage": "https://github.com/isFanLi/codex-quota#readme",
+  "bugs": {
+    "url": "https://github.com/isFanLi/codex-quota/issues"
+  },
+  "keywords": [
+    "codex",
+    "codex-quota",
+    "codex-usage",
+    "quota-widget",
+    "desktop-widget",
+    "electron",
+    "codex额度",
+    "codex额度小组件",
+    "codex额度悬浮球",
+    "codex用量"
+  ],
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "test:pace": "node scripts/verify-pace-advice.js",
+    "test:quota-store": "node scripts/verify-quota-store.js",
+    "test:platform": "node scripts/verify-platform.js",
+    "test": "npm run test:pace && npm run test:quota-store && npm run test:platform",
+    "build": "electron-builder --win portable",
+    "build:win": "electron-builder --win portable --x64",
+    "build:mac": "electron-builder --mac zip --arm64 --x64",
+    "build:dir": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "cn.codex.quota.widget",
+    "productName": "codex-quota",
+    "electronVersion": "31.7.7",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/app-icon.png",
+      "assets/app-icon.ico",
+      "assets/app-icon.icns",
+      "assets/app-icon-tray-16.png",
+      "assets/trayTemplate.png",
+      "assets/trayTemplate@2x.png",
+      "assets/app-icon-256.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/app-icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "codex-quota.exe"
+    },
+    "mac": {
+      "icon": "assets/app-icon.icns",
+      "category": "public.app-category.utilities",
+      "identity": null,
+      "hardenedRuntime": false,
+      "artifactName": "codex-quota-${version}-mac-${arch}.zip",
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  }
+}
