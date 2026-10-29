@@ -1,4 +1,4 @@
-# codex-quota v0.3.2
+# codex-quota v0.3.3
 
 一个 320 × 104 的半透明额度小窗口，支持 Windows 和 macOS。
 
@@ -23,3 +23,13 @@ scripts/smoke-electron.js 验证小窗口、四项菜单、隐藏恢复、刷新
 scripts/cross-package-mac.py 保留官方 Darwin 运行时权限与链接，生成含首次启动脚本的 Mac 包。
 
 基于原 codex-quota-widget 及 xicunwus2025-sys/codex-led-widget 改造。
+
+## v0.3.3 更新
+- 修复新版 ChatGPT 桌面版的 Codex 内置路径：Resources/codex-cli/bin/codex，并兼容嵌套 CodexCLI.app。无需另装 CLI。
+- 面板四边框改为向内绘制，提高边框对比度。
+- 默认背景不透明度提高至 85%。
+- 右键托盘图标 → 背景不透明度：打开 0–100 拖动滑条，实时预览，自动保存。0 全透明、100 不透明；文字和边框保持清晰。
+
+Mac 请退出旧版，完整解压后运行 First Launch.command。Apple 芯片选 arm64，Intel 选 x64。
+
+Windows 打包交互测试、新旧协议与 Mac 路径测试通过。Mac 需要实机确认额度读取及四边框显示。

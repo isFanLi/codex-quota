@@ -1,5 +1,13 @@
 const panel = document.getElementById("quotaPanel");
 const bridge = window.codexQuota;
+function applyBackgroundOpacity(value) {
+  if (Number.isFinite(value) && value >= 0 && value <= 100) {
+    panel.style.setProperty("--panel-opacity", value / 100);
+    panel.style.backdropFilter = value === 0 ? "none" : "blur(20px) saturate(1.06)";
+  }
+}
+bridge.onBackgroundOpacityChanged(applyBackgroundOpacity);
+bridge.getBackgroundOpacity().then(applyBackgroundOpacity).catch(console.error);
 let dragging = null;
 let moveFrame = null;
 let lastDragAt = 0;

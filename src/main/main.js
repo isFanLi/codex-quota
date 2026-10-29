@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, screen } = require("electron");
 const path = require("node:path");
+const fs = require("node:fs");
 const { QuotaStore } = require("./quota-store");
 const IS_MAC = process.platform === "darwin";
 const ASSETS = path.join(__dirname, "../../assets");
@@ -7,12 +8,19 @@ const PANEL_SIZE = { width: 320, height: 104 };
 let mainWindow, tray, trayMenu, quotaStore;
 let isAlwaysOnTop = true;
 let isQuitting = false;
+let backgroundOpacity = 85;
+let appearanceWindow, appearanceSaveTimer;
+function preferencesPath() { return path.join(app.getPath("userData"), "appearance.json"); }
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
   app.on("second-instance", showWindow);
   app.whenReady().then(startApp);
 }
 async function startApp() {
+  try {
+    const saved = JSON.parse(fs.readFileSync(preferencesPath(), "utf8"));
+    if (Number.isFinite(saved.backgroundOpacity) && saved.backgroundOpacity >= 0 && saved.backgroundOpacity <= 100) backgroundOpacity = saved.backgroundOpacity;
+  } catch (_) { /* Use defaults on first launch or invalid preferences. */ }
   if (process.platform === "win32") app.setAppUserModelId("cn.codex.quota.widget");
   if (IS_MAC) app.dock.hide();
   Menu.setApplicationMenu(null);
@@ -65,6 +73,7 @@ function rebuildTrayMenu() {
     { label: "显示/隐藏", click: toggleWindow },
     { label: "刷新额度", click: () => quotaStore.refreshNow("tray-manual").catch(() => {}) },
     { label: isAlwaysOnTop ? "取消置顶" : "置顶", click: toggleAlwaysOnTop },
+    { label: "背景不透明度", click: showAppearance },
     { type: "separator" },
     { label: "退出", click: quitApp }
   ]);
@@ -76,6 +85,15 @@ function toggleAlwaysOnTop() {
   rebuildTrayMenu();
 }
 function registerIpcHandlers() {
+  ipcMain.handle("appearance:get", () => backgroundOpacity);
+  ipcMain.handle("appearance:set", (_event, value) => {
+    if (!Number.isFinite(value) || value < 0 || value > 100) return;
+    backgroundOpacity = Math.round(value);
+    mainWindow.webContents.send("appearance:changed", backgroundOpacity);
+    clearTimeout(appearanceSaveTimer);
+    appearanceSaveTimer = setTimeout(saveAppearance, 200);
+  });
+  ipcMain.handle("appearance:close", () => appearanceWindow?.close());
   ipcMain.handle("quota:state", () => quotaStore.getState());
   ipcMain.handle("window:hide", () => mainWindow.hide());
   ipcMain.handle("window:move", (_event, deltaX, deltaY) => {
@@ -93,6 +111,21 @@ function showWindow() {
   mainWindow.show();
   mainWindow.focus();
 }
+function saveAppearance() {
+  clearTimeout(appearanceSaveTimer);
+  try {
+    fs.mkdirSync(app.getPath("userData"), { recursive: true });
+    fs.writeFileSync(preferencesPath(), JSON.stringify({ backgroundOpacity }));
+  } catch (error) { console.error("Unable to save appearance", error.message); }
+}
+function showAppearance() {
+  if (appearanceWindow && !appearanceWindow.isDestroyed()) { appearanceWindow.show(); appearanceWindow.focus(); return; }
+  appearanceWindow = new BrowserWindow({ width: 280, height: 126, frame: false, resizable: false, alwaysOnTop: true, skipTaskbar: true, show: true,
+    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false } });
+
+  appearanceWindow.on("closed", () => { appearanceWindow = null; saveAppearance(); });
+  appearanceWindow.loadFile(path.join(__dirname, "../renderer/appearance.html")).then(() => { appearanceWindow?.show(); appearanceWindow?.focus(); });
+}
 function quitApp() { isQuitting = true; app.quit(); }
-app.on("before-quit", () => { isQuitting = true; quotaStore?.destroy(); });
+app.on("before-quit", () => { isQuitting = true; saveAppearance(); quotaStore?.destroy(); });
 app.on("window-all-closed", () => {});

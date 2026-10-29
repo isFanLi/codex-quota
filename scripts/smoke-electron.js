@@ -48,7 +48,17 @@ app.whenReady().then(async () => {
     assert.ok(height >= 104 && height <= 110, "Windows may round the frameless minimum height at the current DPI");
     assert.equal(BrowserWindow.getAllWindows().length, 1);
     assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('button').length"), 0);
-    assert.deepEqual(trayTemplate.filter((item) => item.label).map((item) => item.label), ["显示/隐藏", "刷新额度", "取消置顶", "退出"]);
+    assert.deepEqual(trayTemplate.filter((item) => item.label).map((item) => item.label), ["显示/隐藏", "刷新额度", "取消置顶", "背景不透明度", "退出"]);
+    trayTemplate.find(item => item.label === "背景不透明度").click();
+    await until(() => BrowserWindow.getAllWindows().some(w => w !== win && w.isVisible()), "slider opens");
+    const editor = BrowserWindow.getAllWindows().find(w => w !== win);
+    for (const value of [0, 37, 100, 85]) {
+      await editor.webContents.executeJavaScript(`document.getElementById('opacity').value=${value};document.getElementById('opacity').dispatchEvent(new Event('input'))`);
+      await until(() => win.webContents.executeJavaScript(`Number(document.getElementById('quotaPanel').style.getPropertyValue('--panel-opacity')) === ${value / 100}`), "live opacity preview");
+    }
+    editor.close();
+    assert.equal(JSON.parse(fs.readFileSync(path.join(profile, 'appearance.json'), 'utf8')).backgroundOpacity, 85);
+    assert.ok(await win.webContents.executeJavaScript("parseFloat(getComputedStyle(document.getElementById('quotaPanel'),'::after').borderTopWidth) > 0"));
     click(win, 1);
     await wait(120);
     assert.equal(win.isVisible(), true);
@@ -80,7 +90,7 @@ app.whenReady().then(async () => {
     await until(() => win.isVisible(), "relaunch restores");
     if (process.env.QUOTA_SMOKE_SCREENSHOT) fs.writeFileSync(process.env.QUOTA_SMOKE_SCREENSHOT, (await win.webContents.capturePage()).toPNG());
     assert.deepEqual(errors, []);
-    console.log("PASS: one 320x104 window, exactly four tray actions, real quota rendering, refresh, pin toggle, double-click hide, tray/relaunch restore, drag, and no renderer errors.");
+    console.log("PASS: small panel, quota, refresh, pin, opacity applied and saved, inset border, double-click hide, restore, drag, and no renderer errors.");
     if (process.env.QUOTA_SMOKE_LIVE) console.log("Live Codex quota read passed.");
     // Exercise the retained exit action, including normal app cleanup.
     trayTemplate.find((item) => item.label === "退出").click();

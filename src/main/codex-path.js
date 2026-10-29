@@ -18,6 +18,10 @@ function resolveCodexPath({ platform = process.platform, env = process.env, home
     }
   }
   if (platform === "darwin") {
+    for (const appRoot of ["/Applications/ChatGPT.app", p.join(home, "Applications/ChatGPT.app"), "/Applications/Codex.app", p.join(home, "Applications/Codex.app")]) {
+      candidates.push(p.join(appRoot, "Contents/Resources/codex-cli/bin/codex"));
+      candidates.push(p.join(appRoot, "Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"));
+    }
     candidates.push(
       "/Applications/Codex.app/Contents/Resources/codex",
       p.join(home, "Applications/Codex.app/Contents/Resources/codex"),

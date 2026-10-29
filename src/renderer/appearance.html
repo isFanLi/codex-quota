@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>背景不透明度</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:14px 18px;font:13px -apple-system,"Segoe UI",sans-serif;color:#1d2a31;background:#f5f8fa;border:1px solid #687780;height:100vh;overflow:hidden}
+header{display:flex;justify-content:space-between;align-items:center;-webkit-app-region:drag}button,input{-webkit-app-region:no-drag}button{border:0;background:none;font-size:19px;cursor:pointer;color:#52616a}input{width:100%;accent-color:#398ab8;margin:12px 0 5px}footer{display:flex;justify-content:space-between;font-size:11px;color:#52616a}
+</style></head><body><header><label for="opacity">背景不透明度 <output id="value">85%</output></label><button id="close" aria-label="关闭">×</button></header>
+<input id="opacity" type="range" min="0" max="100" step="1" value="85" aria-label="背景不透明度">
+<footer><span>0 全透明</span><span>100 不透明</span></footer><script src="appearance.js"></script></body></html>
