@@ -33,3 +33,6 @@ scripts/cross-package-mac.py 保留官方 Darwin 运行时权限与链接，生�
 Mac 请退出旧版，完整解压后运行 First Launch.command。Apple 芯片选 arm64，Intel 选 x64。
 
 Windows 打包交互测试、新旧协议与 Mac 路径测试通过。Mac 需要实机确认额度读取及四边框显示。
+
+## Windows v0.3.4
+锁定拖动时的面板尺寸。Mac 安装包仍为 v0.3.3。

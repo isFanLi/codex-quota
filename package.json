@@ -1,6 +1,6 @@
 {
   "name": "codex-quota",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Codex 额度小组件 / Windows and macOS quota panel with double-click to hide.",
   "main": "src/main/main.js",
   "author": "codex-quota Contributors",

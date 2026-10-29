@@ -38,6 +38,8 @@ async function startApp() {
 function createWindow() {
   mainWindow = new BrowserWindow({
     ...PANEL_SIZE, frame: false, transparent: true, resizable: false,
+    ...(process.platform === "win32" ? { minWidth: PANEL_SIZE.width, maxWidth: PANEL_SIZE.width,
+      minHeight: PANEL_SIZE.height, maxHeight: PANEL_SIZE.height, thickFrame: false } : {}),
     maximizable: false, fullscreenable: false, alwaysOnTop: isAlwaysOnTop,
     skipTaskbar: true, show: false, backgroundColor: "#00000000",
     icon: path.join(ASSETS, "app-icon.png"),
@@ -99,7 +101,13 @@ function registerIpcHandlers() {
   ipcMain.handle("window:move", (_event, deltaX, deltaY) => {
     if (!Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
     const [x, y] = mainWindow.getPosition();
-    mainWindow.setPosition(Math.round(x + deltaX), Math.round(y + deltaY), false);
+    if (process.platform === "win32") {
+      // Specify fixed DIP dimensions instead of letting setPosition carry forward
+      // native window dimensions after DPI rounding or Windows frame adjustments.
+      mainWindow.setBounds({ x: Math.round(x + deltaX), y: Math.round(y + deltaY), ...PANEL_SIZE }, false);
+    } else {
+      mainWindow.setPosition(Math.round(x + deltaX), Math.round(y + deltaY), false);
+    }
   });
 }
 function toggleWindow() {

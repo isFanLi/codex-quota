@@ -77,6 +77,10 @@ app.whenReady().then(async () => {
     const beforeReads = reads;
     await trayTemplate[1].click();
     assert.ok(reads>beforeReads, "refresh menu actually fetches quota");
+    const beforeSize = win.getSize();
+    for (let i = 0; i < 80; i++) await win.webContents.executeJavaScript(`window.codexQuota.moveWindow(${i % 2 ? -2 : 2}, 0)`);
+    console.log("Drag size before/after", beforeSize, win.getSize());
+    assert.deepEqual(win.getSize(), beforeSize, "Repeated dragging must not resize panel");
     const before = win.getPosition();
     await win.webContents.executeJavaScript("document.getElementById('quotaPanel').dispatchEvent(new MouseEvent('mousedown',{bubbles:true,button:0,screenX:100,screenY:100})); window.dispatchEvent(new MouseEvent('mousemove',{screenX:180,screenY:130}));");
     await wait(100);
