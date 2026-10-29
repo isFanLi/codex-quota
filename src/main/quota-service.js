@@ -7,7 +7,9 @@ const DEFAULT_TIMEOUT_MS = 12000;
 
 async function getQuota() {
   const response = await requestRateLimits();
-  const snapshot = response.rateLimitsByLimitId?.codex;
+  const legacy = response.rateLimits;
+  const snapshot = response.rateLimitsByLimitId?.codex
+    ?? (legacy && (!legacy.limitId || legacy.limitId === "codex") ? legacy : null);
 
   if (!snapshot) {
     throw new Error("Codex did not return the codex rate-limit snapshot.");
@@ -77,7 +79,7 @@ function clampPercent(value) {
 
 function requestRateLimits() {
   const codexPath = resolveCodexPath();
-  const child = spawn(codexPath, ["app-server", "--listen", "stdio://"], {
+  const child = spawn(codexPath, ["app-server"], {
     stdio: ["pipe", "pipe", "pipe"],
     env: codexEnvironment(codexPath),
     windowsHide: true
@@ -99,14 +101,13 @@ function requestRateLimits() {
   const send = (method, params) => {
     const id = nextId++;
     const payload = params === undefined ? { id, method } : { id, method, params };
-    child.stdin.write(`${JSON.stringify(payload)}\n`);
-
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         pending.delete(id);
         reject(new Error(`Codex request timed out: ${method}`));
       }, DEFAULT_TIMEOUT_MS);
       pending.set(id, { resolve, reject, timer });
+      child.stdin.write(`${JSON.stringify(payload)}\n`);
     });
   };
 
@@ -126,10 +127,15 @@ function requestRateLimits() {
   });
 
   return new Promise((resolve, reject) => {
+    child.stdin.on("error", (error) => {
+      rejectPendingRequests(pending, error);
+      cleanup();
+      reject(new Error(`无法连接 Codex 内置服务：${error.message}`));
+    });
     child.once("error", (error) => {
       cleanup();
       reject(error.code === "ENOENT"
-        ? new Error("未找到 Codex。请先安装并登录 Codex 桌面版或 Codex CLI，然后重新打开小组件。")
+        ? new Error("未找到桌面版自带的 Codex 程序。请将 Codex.app 或 ChatGPT.app 放入“应用程序”文件夹后重试，无需另装 CLI。")
         : error);
     });
 
@@ -150,6 +156,7 @@ function requestRateLimits() {
           },
           capabilities: null
         });
+        child.stdin.write(`${JSON.stringify({ method: "initialized" })}\n`);
         const result = await send("account/rateLimits/read");
         cleanup();
         resolve(result);

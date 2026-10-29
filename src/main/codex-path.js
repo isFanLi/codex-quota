@@ -21,6 +21,8 @@ function resolveCodexPath({ platform = process.platform, env = process.env, home
     candidates.push(
       "/Applications/Codex.app/Contents/Resources/codex",
       p.join(home, "Applications/Codex.app/Contents/Resources/codex"),
+      "/Applications/ChatGPT.app/Contents/Resources/codex",
+      p.join(home, "Applications/ChatGPT.app/Contents/Resources/codex"),
       "/opt/homebrew/bin/codex",
       "/usr/local/bin/codex",
       p.join(home, ".local/bin/codex"),

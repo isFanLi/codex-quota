@@ -1,6 +1,6 @@
 {
   "name": "codex-quota",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Codex 额度小组件 / Windows and macOS quota panel with double-click to hide.",
   "main": "src/main/main.js",
   "author": "codex-quota Contributors",
@@ -32,11 +32,12 @@
     "test:pace": "node scripts/verify-pace-advice.js",
     "test:quota-store": "node scripts/verify-quota-store.js",
     "test:platform": "node scripts/verify-platform.js",
-    "test": "npm run test:pace && npm run test:quota-store && npm run test:platform",
+    "test": "npm run test:pace && npm run test:quota-store && npm run test:platform && npm run test:protocol",
     "build": "electron-builder --win portable",
     "build:win": "electron-builder --win portable --x64",
     "build:mac": "electron-builder --mac zip --arm64 --x64",
-    "build:dir": "electron-builder --dir"
+    "build:dir": "electron-builder --dir",
+    "test:protocol": "node scripts/verify-protocol.js"
   },
   "build": {
     "appId": "cn.codex.quota.widget",

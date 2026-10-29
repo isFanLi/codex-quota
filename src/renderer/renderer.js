@@ -27,6 +27,11 @@ function renderState(snapshot) {
   renderWindow("weekly", windows.find((window) => Number(window.windowDurationMins) === 10080));
   document.body.dataset.state = snapshot?.status || "loading";
   panel.title = snapshot?.error?.message || "";
+  if (snapshot?.error) {
+    document.getElementById("shortReset").textContent = "读取失败（悬停查看原因）";
+  } else if (!quota) {
+    document.getElementById("shortReset").textContent = "正在读取…";
+  }
 }
 panel.addEventListener("mousedown", (event) => {
   if (event.button !== 0) return;

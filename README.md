@@ -1,4 +1,4 @@
-# codex-quota v0.3.1
+# codex-quota v0.3.2
 
 一个 320 × 104 的半透明额度小窗口，支持 Windows 和 macOS。
 

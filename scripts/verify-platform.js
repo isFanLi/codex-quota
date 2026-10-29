@@ -6,6 +6,8 @@ function resolve(platform, files, env = {}, extras = {}) {
 }
 
 assert.equal(resolve("darwin", ["/Applications/Codex.app/Contents/Resources/codex"]), "/Applications/Codex.app/Contents/Resources/codex");
+assert.equal(resolve("darwin", ["/Applications/ChatGPT.app/Contents/Resources/codex"]), "/Applications/ChatGPT.app/Contents/Resources/codex");
+assert.equal(resolve("darwin", ["/Users/test/Applications/ChatGPT.app/Contents/Resources/codex"]), "/Users/test/Applications/ChatGPT.app/Contents/Resources/codex");
 assert.equal(resolve("darwin", ["/opt/homebrew/bin/codex"]), "/opt/homebrew/bin/codex");
 assert.equal(resolve("darwin", ["/usr/local/bin/codex"]), "/usr/local/bin/codex");
 assert.equal(resolve("darwin", ["/Users/test/Applications/Codex.app/Contents/Resources/codex"]), "/Users/test/Applications/Codex.app/Contents/Resources/codex");
